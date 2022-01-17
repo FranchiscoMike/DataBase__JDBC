@@ -20,6 +20,7 @@ public class DBConfig {
         try {
             Class.forName("org.postgresql.Driver");
 
+
             connection = DriverManager.getConnection(url, dbUser, password);
 
         } catch (ClassNotFoundException | SQLException e) {

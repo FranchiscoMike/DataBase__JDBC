@@ -1,7 +1,6 @@
 package repasitory;
 
-import entity.Response;
-import entity.UserClass;
+import entity.*;
 import lombok.SneakyThrows;
 import utils.DBConfig;
 
@@ -40,6 +39,8 @@ public class MyRaspiratory {
         response.setSuccess(callableStatement.getBoolean(8));
         response.setMessage(callableStatement.getString(7));
 
+        System.out.println(response);
+
         return response;
     }
 
@@ -68,7 +69,7 @@ public class MyRaspiratory {
 
 
     @SneakyThrows
-    public static List<UserClass> showAllUsers() {
+    public static void showAllUsers() {
         Connection connection = DBConfig.connection();
         List<UserClass> userList = new ArrayList<>();
 
@@ -90,13 +91,159 @@ public class MyRaspiratory {
 
         userList.forEach(System.out::println);
 
-        return userList;
+        userList.forEach(System.out::println);
     }
 
-    public static Response addUser( String email, String password, String fullName, String phone) {
+    public static Response addUser(String email, String password, String fullName, String phone) {
         Response response = new Response();
         // coding :
 
         return response;
     }
+
+    @SneakyThrows
+    public static Response createInputForNewInputProduct(int wareHouse_id,
+                                                         int currency_id,
+                                                         int supplier_id) {
+
+        Response response = new Response();
+
+        Connection connection = DBConfig.connection();
+        CallableStatement callableStatement = connection.prepareCall("{call create_input(?,?,?,?,?) }");
+
+        callableStatement.setInt(1,currency_id);
+        callableStatement.setInt(2,wareHouse_id);
+        callableStatement.setInt(3,supplier_id);
+
+        // out parametr bo'lganiga shunaqa :
+        callableStatement.registerOutParameter(4,Types.VARCHAR);
+        callableStatement.registerOutParameter(5,Types.BOOLEAN);
+
+
+        callableStatement.execute();
+
+        response.setMessage(callableStatement.getString(4));
+        response.setSuccess(callableStatement.getBoolean(5));
+
+        System.out.println(response);
+
+        return response;
+    }
+
+    @SneakyThrows
+    public static Response inputProduct(
+            int product_id,
+            int amount,
+            double price) {
+        Response response = new Response();
+// coding :
+        Connection connection = DBConfig.connection();
+
+        // function create in databse
+        CallableStatement callableStatement = connection.prepareCall("{call input_product(?,?,?,?,?)}");
+
+        callableStatement.setInt(1,product_id);
+        callableStatement.setInt(2,amount);
+        callableStatement.setDouble(3,price);
+
+
+        // out parametr bo'lganiga shunaqa :
+        callableStatement.registerOutParameter(4,Types.VARCHAR);
+        callableStatement.registerOutParameter(5,Types.BOOLEAN);
+
+
+        callableStatement.execute();
+
+        response.setMessage(callableStatement.getString(4));
+        response.setSuccess(callableStatement.getBoolean(5));
+
+        System.out.println(response);
+
+
+        return response;
+    }
+
+    public static void showAllCurrencies() {
+        Connection connection = DBConfig.connection();
+        try {
+            Statement statement = connection.createStatement();
+
+            ResultSet resultSet = statement.executeQuery("select * from currency where active = true");
+
+            List<Currency> currencyList = new ArrayList<>();
+
+            while (resultSet.next()) {
+                Currency currency = new Currency();
+
+                currency.setId(resultSet.getInt(1));
+                currency.setName(resultSet.getString(2));
+                currency.setActive(true);
+
+                currencyList.add(currency);
+
+            }
+            currencyList.forEach(System.out::println);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+
+    }
+
+    public static void showAllWereHouses() {
+
+        Connection connection = DBConfig.connection();
+        try {
+            Statement statement = connection.createStatement();
+
+            ResultSet resultSet = statement.executeQuery("select * from warehouse where active = true");
+
+            List<WereHouse> wereHouseList = new ArrayList<>();
+
+            while (resultSet.next()) {
+                WereHouse wereHouse = new WereHouse();
+
+
+                wereHouse.setId(resultSet.getInt(1));
+                wereHouse.setName(resultSet.getString(2));
+                wereHouse.setActive(true);
+
+                wereHouseList.add(wereHouse);
+
+            }
+            wereHouseList.forEach(System.out::println);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+
+    }
+
+    public static void showAllSuppliers() {
+        Connection connection = DBConfig.connection();
+        try {
+            Statement statement = connection.createStatement();
+
+            ResultSet resultSet = statement.executeQuery("select * from supplier where active = true");
+
+            List<Supplier> supplierList = new ArrayList<>();
+
+            while (resultSet.next()) {
+                Supplier supplier = new Supplier();
+
+                supplier.setId(resultSet.getInt(1));
+                supplier.setName(resultSet.getString(2));
+                supplier.setActive(true);
+
+                supplierList.add(supplier);
+
+            }
+            supplierList.forEach(System.out::println);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+
+    }
+
 }
